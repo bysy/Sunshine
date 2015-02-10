@@ -5,6 +5,6 @@
         <item>@string/pref_label_imperial</item></string-array>
 
     <string-array name="prefs_units_entryvalues">
-        <item>@string/pref_value_metric</item>
-        <item>@string/pref_value_imperial</item></string-array>
+        <item>@string/pref_units_metric</item>
+        <item>@string/pref_units_imperial</item></string-array>
 </resources>
