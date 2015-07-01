@@ -9,6 +9,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -57,7 +60,19 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            List<String> forecastData = makeFakeData();
             return rootView;
+        }
+
+        private List<String> makeFakeData() {
+            final String[] data = { "Today -- Sunny -- 76/62",
+                            "Tomorrow -- Mostly cloudy -- 72/67",
+                            "Tuesday -- Sunny -- 84/70",
+                            "Wednesday -- Rain likely -- 78/58",
+                            "Thursday -- Mostly sunny -- 75/62",
+                            "Friday -- Cloudy -- 74/64",
+                            "Saturday -- Sunny -- 77/60" };
+            return Arrays.asList(data);
         }
     }
 }
