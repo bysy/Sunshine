@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -61,6 +62,10 @@ public class MainActivity extends ActionBarActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
             List<String> forecastData = makeFakeData();
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                    R.layout.list_item_forecast,
+                    R.id.list_item_forecast_textview,
+                    forecastData);
             return rootView;
         }
 
