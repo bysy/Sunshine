@@ -105,7 +105,7 @@ public class ForecastFragment extends Fragment {
                 // We have a forecast JSON string.
                 return buffer.toString();
             } catch (IOException e) {
-                Log.e(TAG, "Error ", e);
+                Log.w(TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
