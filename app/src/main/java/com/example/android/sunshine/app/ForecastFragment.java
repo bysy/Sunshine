@@ -33,6 +33,7 @@ import java.util.List;
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
+    private String mLocation = "94043,usa";
 
     public ForecastFragment() {
     }
@@ -53,7 +54,7 @@ public class ForecastFragment extends Fragment {
         }
 
         FetchWeatherTask fwt = new FetchWeatherTask();
-        fwt.execute("94043,usa");
+        fwt.execute(mLocation);
 
         return rootView;
     }
@@ -69,7 +70,7 @@ public class ForecastFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 FetchWeatherTask fwt = new FetchWeatherTask();
-                fwt.execute();
+                fwt.execute(mLocation);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
