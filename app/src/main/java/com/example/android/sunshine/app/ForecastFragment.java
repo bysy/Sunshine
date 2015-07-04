@@ -124,8 +124,9 @@ public class ForecastFragment extends Fragment {
                     // Stream was empty.  No point in parsing.
                     return null;
                 }
-                // We have a forecast JSON string.
-                return buffer.toString();
+                final String forecastJsonStr = buffer.toString();
+                Log.v(TAG, "Weather JSON response returned by server:\n" + forecastJsonStr);
+                return forecastJsonStr;
             } catch (IOException e) {
                 Log.w(TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
