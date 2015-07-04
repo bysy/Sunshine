@@ -26,13 +26,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
+    private ArrayAdapter<String> mAdapter;
     private String mLocation = "94043,usa";
 
     public ForecastFragment() {
@@ -43,14 +44,13 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        List<String> forecastData = makeFakeData();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+        mAdapter = new ArrayAdapter<>(getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
-                forecastData);
+                new ArrayList<String>());
         ListView lv = (ListView) rootView.findViewById(R.id.listview_forecast);
         if (lv!=null) {
-            lv.setAdapter(adapter);
+            lv.setAdapter(mAdapter);
         }
 
         FetchWeatherTask fwt = new FetchWeatherTask();
@@ -77,21 +77,24 @@ public class ForecastFragment extends Fragment {
         }
     }
 
-    private List<String> makeFakeData() {
-        final String[] data = { "Today -- Sunny -- 76/62",
-                "Tomorrow -- Mostly cloudy -- 72/67",
-                "Tuesday -- Sunny -- 84/70",
-                "Wednesday -- Rain likely -- 78/58",
-                "Thursday -- Mostly sunny -- 75/62",
-                "Friday -- Cloudy -- 74/64",
-                "Saturday -- Sunny -- 77/60" };
-        return Arrays.asList(data);
-    }
-
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         private String TAG = FetchWeatherTask.class.getSimpleName();
         private final int NUM_DAYS = 7;
 
+        /** Update array adapter in outer class to show the weather forecast. */
+        @Override
+        protected void onPostExecute(String[] forecastStrings) {
+            super.onPostExecute(forecastStrings);
+            if (forecastStrings==null) { return; }
+            mAdapter.clear();
+            // final List<String> forecastData = Arrays.asList(forecastStrings);
+            // API 11: mAdapter.addAll(forecastData);
+            for (String day : forecastStrings) {
+                mAdapter.add(day);
+            }
+        }
+
+        /** Return weather forecast as String[] where each element corresponds to a day */
         @Override
         protected String[] doInBackground(String ... locations) {
             if (locations.length==0) {
@@ -179,11 +182,6 @@ public class ForecastFragment extends Fragment {
                     }
                 }
             }
-        }
-
-        @Override
-        protected void onPostExecute(String[] s) {
-            super.onPostExecute(s);
         }
 
         // Below from github gist:
