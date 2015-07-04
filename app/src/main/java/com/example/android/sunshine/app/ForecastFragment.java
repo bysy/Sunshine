@@ -47,7 +47,7 @@ public class ForecastFragment extends Fragment {
         }
 
         FetchWeatherTask fwt = new FetchWeatherTask();
-        fwt.execute();
+        fwt.execute("94043,usa");
 
         return rootView;
     }
@@ -81,11 +81,16 @@ public class ForecastFragment extends Fragment {
         return Arrays.asList(data);
     }
 
-    public class FetchWeatherTask extends AsyncTask<Void, Void, String> {
+    public class FetchWeatherTask extends AsyncTask<String, Void, String> {
         private String TAG = FetchWeatherTask.class.getSimpleName();
 
         @Override
-        protected String doInBackground(Void ... unused) {
+        protected String doInBackground(String ... locations) {
+            if (locations.length==0) {
+                Log.d(TAG, "No location provided.");
+                return null;
+            }
+            final String location = locations[0];
             // From from github gist, slightly modified:
 
             // These two need to be declared outside the try/catch
@@ -105,7 +110,7 @@ public class ForecastFragment extends Fragment {
                             .appendPath("2.5")
                             .appendPath("forecast")
                             .appendPath("daily")
-                            .appendQueryParameter("q", "94043,usa")
+                            .appendQueryParameter("q", location)
                             .appendQueryParameter("mode", "json")
                             .appendQueryParameter("units", "metric")
                             .appendQueryParameter("cnt", "7")
