@@ -77,8 +77,8 @@ public class ForecastFragment extends Fragment {
     private String readLocationFromSettings() {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
         final String locKey = getString(R.string.pref_location_key);
-        final String defaultLoc = getString(R.string.pref_location_default);
-        return settings.getString(locKey, defaultLoc);
+        return settings.getString(locKey, "");  // default set in xml
+        // TODO: Create shared settings on first run to ensure values are available (default or user-provided)
     }
 
     private void updateWeather() {
