@@ -33,6 +33,8 @@ public class SettingsActivity extends PreferenceActivity
         // updated when the preference changes.
         //noinspection deprecation
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+        //noinspection deprecation
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.prefs_units_key)));
     }
 
     /**

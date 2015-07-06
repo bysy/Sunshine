@@ -9,5 +9,11 @@
         android:defaultValue="@string/pref_location_default"
         android:inputType="text"
         android:singleLine="true" />
+    <ListPreference
+        android:title="Units"
+        android:key="@string/prefs_units_key"
+        android:defaultValue="metric"
+        android:entries="@array/prefs_units_entries"
+        android:entryValues="@array/prefs_units_entryvalues" />
 
 </PreferenceScreen>

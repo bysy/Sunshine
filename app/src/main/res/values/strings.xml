@@ -11,7 +11,9 @@
     <!-- Label for the location preference [CHAR LIMIT=30] -->
     <string name="pref_location_label">Location</string>
 
-    <string name="pref_location_key">location</string> <!-- Do not translate -->
-    <string name="pref_location_default">94043,usa</string> <!-- Do not translate -->
+    <!-- Do not translate the following strings -->
+    <string name="pref_location_key">location</string>
+    <string name="pref_location_default">94043,usa</string>
+    <string name="prefs_units_key">units</string>
 
 </resources>
