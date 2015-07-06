@@ -11,9 +11,14 @@
     <!-- Label for the location preference [CHAR LIMIT=30] -->
     <string name="pref_location_label">Location</string>
 
+    <string name="pref_label_metric">Metric</string>
+    <string name="pref_label_imperial">Imperial</string>
+
     <!-- Do not translate the following strings -->
     <string name="pref_location_key">location</string>
     <string name="pref_location_default">94043,usa</string>
     <string name="prefs_units_key">units</string>
+    <string name="pref_value_metric">metric</string>
+    <string name="pref_value_imperial">imperial</string>
 
 </resources>
