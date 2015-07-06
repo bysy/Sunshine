@@ -102,9 +102,21 @@ public class ForecastFragment extends Fragment {
         }
     }
 
+    private static double celsiusToFahrenheit(double celsiusValue) {
+        return 9.0/5.0 * celsiusValue + 32.0;
+    }
+
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
         private String TAG = FetchWeatherTask.class.getSimpleName();
         private final int NUM_DAYS = 7;
+        private final String UNITS;
+
+        FetchWeatherTask() {
+            SharedPreferences settings = PreferenceManager.
+                    getDefaultSharedPreferences(getActivity());
+            final String unitsKey = getString(R.string.prefs_units_key);
+            UNITS = settings.getString(unitsKey, "");
+        }
 
         /** Update array adapter in outer class to show the weather forecast. */
         @Override
@@ -225,6 +237,10 @@ public class ForecastFragment extends Fragment {
          * Prepare the weather high/lows for presentation.
          */
         private String formatHighLows(double high, double low) {
+            if (UNITS.equals("imperial")) {
+                high = celsiusToFahrenheit(high);
+                low = celsiusToFahrenheit(low);
+            }
             // For presentation, assume the user doesn't care about tenths of a degree.
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
