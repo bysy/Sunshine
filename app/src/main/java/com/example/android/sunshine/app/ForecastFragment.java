@@ -1,6 +1,5 @@
 package com.example.android.sunshine.app;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -65,8 +64,13 @@ public class ForecastFragment extends Fragment {
                 startActivity(i);
             }
         });
-        updateWeather();
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     private String readLocationFromSettings() {
