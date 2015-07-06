@@ -1,9 +1,12 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.format.Time;
 import android.util.Log;
@@ -37,7 +40,6 @@ import java.util.ArrayList;
 public class ForecastFragment extends Fragment {
     public static final String FORECAST_STRING = "FORECAST_STRING";
     private ArrayAdapter<String> mAdapter;
-    private String mLocation = "94043,usa";
 
     public ForecastFragment() {
     }
@@ -65,9 +67,16 @@ public class ForecastFragment extends Fragment {
         });
 
         FetchWeatherTask fwt = new FetchWeatherTask();
-        fwt.execute(mLocation);
+        fwt.execute(readLocationFromSettings());
 
         return rootView;
+    }
+
+    private String readLocationFromSettings() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        final String locKey = getString(R.string.pref_location_key);
+        final String defaultLoc = getString(R.string.pref_location_default);
+        return settings.getString(locKey, defaultLoc);
     }
 
     @Override
@@ -81,7 +90,7 @@ public class ForecastFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_refresh:
                 FetchWeatherTask fwt = new FetchWeatherTask();
-                fwt.execute(mLocation);
+                fwt.execute(readLocationFromSettings());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
