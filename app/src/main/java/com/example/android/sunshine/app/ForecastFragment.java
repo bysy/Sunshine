@@ -65,10 +65,7 @@ public class ForecastFragment extends Fragment {
                 startActivity(i);
             }
         });
-
-        FetchWeatherTask fwt = new FetchWeatherTask();
-        fwt.execute(readLocationFromSettings());
-
+        updateWeather();
         return rootView;
     }
 
@@ -77,6 +74,11 @@ public class ForecastFragment extends Fragment {
         final String locKey = getString(R.string.pref_location_key);
         final String defaultLoc = getString(R.string.pref_location_default);
         return settings.getString(locKey, defaultLoc);
+    }
+
+    private void updateWeather() {
+        FetchWeatherTask fwt = new FetchWeatherTask();
+        fwt.execute(readLocationFromSettings());
     }
 
     @Override
@@ -89,8 +91,7 @@ public class ForecastFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_refresh:
-                FetchWeatherTask fwt = new FetchWeatherTask();
-                fwt.execute(readLocationFromSettings());
+                updateWeather();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
