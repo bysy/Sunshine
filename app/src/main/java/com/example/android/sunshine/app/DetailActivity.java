@@ -33,7 +33,9 @@ public class DetailActivity extends ActionBarActivity {
 
     private Intent getShareIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("text/*");
+        //noinspection deprecation since we target older API
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
         final Intent in = getIntent();
         String forecast = null;
         if (in!=null) {
