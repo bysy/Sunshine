@@ -1,6 +1,8 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -40,8 +42,23 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             }
+            case R.id.action_view_location: {
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW);
+                mapIntent.setData(getGeoUri());
+                if (mapIntent.resolveActivity(getPackageManager())!=null) {
+                    startActivity(mapIntent);
+                }
+            }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Uri getGeoUri() {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        final String locKey = getString(R.string.pref_location_key);
+        final String location = settings.getString(locKey, "");
+        final Uri uri = Uri.parse("geo:0,0?q="+Uri.encode(location));
+        return uri;
     }
 }
