@@ -154,6 +154,9 @@ public class TestDb extends AndroidTestCase {
     public void testWeatherTable() {
         // First insert the location, and then use the locationRowId to insert
         // the weather. Make sure to cover as many failure cases as you can.
+        final SQLiteDatabase db = new WeatherDbHelper(mContext).getWritableDatabase();
+        final long locationId = insertLocation(db, TestUtilities.createNorthPoleLocationValues());
+        // insertLocation() asserts that the insertion is valid
 
         // Instead of rewriting all of the code we've already written in testLocationTable
         // we can move this code to insertLocation and then call insertLocation from both
@@ -164,18 +167,30 @@ public class TestDb extends AndroidTestCase {
 
         // Create ContentValues of what you want to insert
         // (you can use the createWeatherValues TestUtilities function if you wish)
+        final ContentValues weatherValues = TestUtilities.createWeatherValues(locationId);
 
         // Insert ContentValues into database and get a row ID back
-
+        final long weatherId =
+                db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, weatherValues);
+        assertTrue("Error inserting weather entry", weatherId!=-1);
         // Query the database and receive a Cursor back
-
+        final Cursor weatherCursor = db.query(WeatherContract.WeatherEntry.TABLE_NAME,
+                        null, null, null, null, null, null);
         // Move the cursor to a valid database row
+        final boolean rowsNotEmpty = weatherCursor.moveToFirst();
+        assertTrue("No entries found in weather table" + weatherId, rowsNotEmpty);
 
         // Validate data in resulting Cursor with the original ContentValues
         // (you can use the validateCurrentRecord function in TestUtilities to validate the
         // query if you like)
+        TestUtilities.validateCurrentRecord("Weather record doesn't match original values",
+                weatherCursor, weatherValues);
+
+        assertFalse("Single weather entry expected", weatherCursor.moveToNext());
 
         // Finally, close the cursor and database
+        weatherCursor.close();
+        db.close();
     }
 
 
