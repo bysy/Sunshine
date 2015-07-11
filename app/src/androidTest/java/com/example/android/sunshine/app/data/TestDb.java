@@ -119,27 +119,33 @@ public class TestDb extends AndroidTestCase {
 
         // Create ContentValues of what you want to insert
         // (you can use the createNorthPoleLocationValues if you wish)
-        ContentValues npcv = TestUtilities.createNorthPoleLocationValues();
+        final ContentValues originalValues = TestUtilities.createNorthPoleLocationValues();
 
         // Insert ContentValues into database and get a row ID back
         final String HACK_NOT_NEEDED = null;
-        long rowId = db.insert(
+        final long rowId = db.insert(
                 WeatherContract.LocationEntry.TABLE_NAME,
                 HACK_NOT_NEEDED,
-                npcv);
+                originalValues);
         assertFalse("Insertion of location row failed", rowId==-1);
 
         // Query the database and receive a Cursor back
-        fail("Not implemented");
+        Cursor cursor = db.query(
+                WeatherContract.LocationEntry.TABLE_NAME,
+                null, null, null, null, null, null);
 
         // Move the cursor to a valid database row
+        final boolean moveToFirstSuccessful = cursor.moveToFirst();
+        assertTrue("Cursor did not have any rows", moveToFirstSuccessful);
 
         // Validate data in resulting Cursor with the original ContentValues
         // (you can use the validateCurrentRecord function in TestUtilities to validate the
         // query if you like)
+        TestUtilities.validateCurrentRecord("Invalid data: ", cursor, originalValues);
 
         // Finally, close the cursor and database
-
+        cursor.close();
+        db.close();
     }
 
     /*
