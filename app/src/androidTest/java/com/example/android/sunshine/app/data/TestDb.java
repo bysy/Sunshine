@@ -143,6 +143,9 @@ public class TestDb extends AndroidTestCase {
         // query if you like)
         TestUtilities.validateCurrentRecord("Invalid data: ", cursor, originalValues);
 
+        final boolean haveMoreThanOneRow = cursor.moveToNext();
+        assertFalse("Expected a single row in result, found multiple", haveMoreThanOneRow);
+
         // Finally, close the cursor and database
         cursor.close();
         db.close();
