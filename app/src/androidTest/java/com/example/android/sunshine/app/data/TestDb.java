@@ -121,13 +121,7 @@ public class TestDb extends AndroidTestCase {
         // (you can use the createNorthPoleLocationValues if you wish)
         final ContentValues originalValues = TestUtilities.createNorthPoleLocationValues();
 
-        // Insert ContentValues into database and get a row ID back
-        final String HACK_NOT_NEEDED = null;
-        final long rowId = db.insert(
-                WeatherContract.LocationEntry.TABLE_NAME,
-                HACK_NOT_NEEDED,
-                originalValues);
-        assertFalse("Insertion of location row failed", rowId==-1);
+        insertLocation(db, originalValues);
 
         // Query the database and receive a Cursor back
         Cursor cursor = db.query(
@@ -190,7 +184,17 @@ public class TestDb extends AndroidTestCase {
         code from testLocationTable to here so that you can call this code from both
         testWeatherTable and testLocationTable.
      */
-    public long insertLocation() {
-        return -1L;
+    public static long insertLocation(SQLiteDatabase db, ContentValues locationValues) {
+        // NOTE: We could use TestUtilities.insertNorthPoleLocation() for the same
+        // effect but this way is a little more flexible and lightweight.
+
+        // Insert ContentValues into database and get a row ID back
+        final String HACK_NOT_NEEDED = null;
+        final long rowId = db.insert(
+                WeatherContract.LocationEntry.TABLE_NAME,
+                HACK_NOT_NEEDED,
+                locationValues);
+        assertFalse("Insertion of location row failed", rowId==-1);
+        return rowId;
     }
 }
