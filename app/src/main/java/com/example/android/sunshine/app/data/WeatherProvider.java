@@ -24,6 +24,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import java.util.Queue;
+
 public class WeatherProvider extends ContentProvider {
 
     // The URI Matcher used by this content provider.
@@ -34,6 +36,18 @@ public class WeatherProvider extends ContentProvider {
     static final int WEATHER_WITH_LOCATION = 101;
     static final int WEATHER_WITH_LOCATION_AND_DATE = 102;
     static final int LOCATION = 300;
+
+    private static final SQLiteQueryBuilder sWeatherQueryBuilder;
+    static {
+        sWeatherQueryBuilder = new SQLiteQueryBuilder();
+        sWeatherQueryBuilder.setTables(WeatherContract.WeatherEntry.TABLE_NAME);
+    }
+
+    private static final SQLiteQueryBuilder sLocationQueryBuilder;
+    static {
+        sLocationQueryBuilder = new SQLiteQueryBuilder();
+        sLocationQueryBuilder.setTables(WeatherContract.LocationEntry.TABLE_NAME);
+    }
 
     private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
 
@@ -187,12 +201,26 @@ public class WeatherProvider extends ContentProvider {
             }
             // "weather"
             case WEATHER: {
-                retCursor = null;
+                retCursor = sWeatherQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,  // no groupBy
+                        null,  // no having
+                        sortOrder);
                 break;
             }
             // "location"
             case LOCATION: {
-                retCursor = null;
+                retCursor = sLocationQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
             }
 
