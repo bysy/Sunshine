@@ -16,6 +16,7 @@
 package com.example.android.sunshine.app.data;
 
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
@@ -435,6 +436,17 @@ public class TestProvider extends AndroidTestCase {
         mContext.getContentResolver().unregisterContentObserver(weatherObserver);
     }
 
+    public void testDeleteWithNullSelection() {
+        testInsertReadProvider();
+        final Uri weatherUri = WeatherEntry.CONTENT_URI;
+        ContentResolver contentResolver = getContext().getContentResolver();
+        ContentValues newWeather = TestUtilities.createWeatherValues(1);
+        newWeather.put(WeatherEntry.COLUMN_DATE, "1234567");
+        contentResolver.insert(weatherUri, newWeather);
+        long numDeleted = contentResolver.delete(weatherUri, null, null);
+        assertTrue("Expected delete() to return the number of rows that were actually deleted",
+                numDeleted >= 2);
+    }
 
     static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
     static ContentValues[] createBulkInsertWeatherValues(long locationRowId) {

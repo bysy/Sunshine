@@ -23,6 +23,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 import java.util.Queue;
 
@@ -271,6 +272,11 @@ public class WeatherProvider extends ContentProvider {
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         // Student: Use the uriMatcher to match the WEATHER and LOCATION URI's we are going to
         // handle.  If it doesn't match these, throw an UnsupportedOperationException.
+        // TRICKY: Supposedly, 1 means return number of rows deleted when deleting all rows
+        // whereas null would be translated to NULL which wouldn't return the number of
+        // rows deleted. Except it does actually give the correct number even without
+        // the 1. However, this behavior may be a version-dependent.
+        if (selection==null) { selection = "1"; }
         int rowsDeleted = 0;
         switch (sUriMatcher.match(uri)) {
             case WEATHER: {
@@ -289,7 +295,7 @@ public class WeatherProvider extends ContentProvider {
         // the uri listeners (using the content resolver) if the rowsDeleted != 0 or the selection
         // is null.
         // Oh, and you should notify the listeners here.
-        if (rowsDeleted!=0) {  // Don't see the point of his selection==null test
+        if (rowsDeleted!=0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         // Student: return the actual rows deleted
