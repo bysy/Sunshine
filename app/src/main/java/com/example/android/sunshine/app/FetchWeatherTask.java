@@ -15,6 +15,7 @@
  */
 package com.example.android.sunshine.app;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -130,7 +131,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
             locationValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
             Uri newUri = mContext.getContentResolver().insert(
                     WeatherContract.LocationEntry.CONTENT_URI, locationValues);
-            return Long.parseLong(newUri.getLastPathSegment());
+            return ContentUris.parseId(newUri);
         } finally {
             cursor.close();
         }
