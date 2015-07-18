@@ -17,11 +17,9 @@ package com.example.android.sunshine.app;
 
 import android.annotation.TargetApi;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 
 import com.example.android.sunshine.app.data.WeatherContract;
-import com.example.android.sunshine.app.data.WeatherDbHelper;
 
 public class TestFetchWeatherTask extends AndroidTestCase{
     static final String ADD_LOCATION_SETTING = "Sunnydale, CA";
@@ -92,6 +90,7 @@ public class TestFetchWeatherTask extends AndroidTestCase{
 
             assertEquals("Error: inserting a location again should return the same ID",
                     locationId, newLocationId);
+            locationCursor.close();
         }
         // reset our state back to normal
         getContext().getContentResolver().delete(WeatherContract.LocationEntry.CONTENT_URI,
