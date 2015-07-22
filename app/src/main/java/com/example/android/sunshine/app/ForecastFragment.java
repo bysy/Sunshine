@@ -23,7 +23,7 @@ import java.util.ArrayList;
  */
 public class ForecastFragment extends Fragment {
     public static final String FORECAST_STRING = "FORECAST_STRING";
-    private ArrayAdapter<String> mAdapter;
+    private ArrayAdapter<String> mForecastAdapter;
 
     public ForecastFragment() {
     }
@@ -33,17 +33,17 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        mAdapter = new ArrayAdapter<>(getActivity(),
+        mForecastAdapter = new ArrayAdapter<>(getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
                 new ArrayList<String>());
         ListView lv = (ListView) rootView.findViewById(R.id.listview_forecast);
         if (lv==null) { return rootView; }
-        lv.setAdapter(mAdapter);
+        lv.setAdapter(mForecastAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = mAdapter.getItem(position);
+                String forecast = mForecastAdapter.getItem(position);
                 Intent i = new Intent(getActivity(), DetailActivity.class);
                 i.putExtra(FORECAST_STRING, forecast);
                 startActivity(i);
@@ -65,7 +65,7 @@ public class ForecastFragment extends Fragment {
     }
 
     private void updateWeather() {
-        FetchWeatherTask fwt = new FetchWeatherTask(getActivity(), mAdapter);
+        FetchWeatherTask fwt = new FetchWeatherTask(getActivity(), mForecastAdapter);
         fwt.execute(readLocationFromSettings());
     }
 
