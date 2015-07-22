@@ -13,6 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 
@@ -20,11 +23,19 @@ import com.example.android.sunshine.app.data.WeatherContract;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String FORECAST_STRING = "FORECAST_STRING";
+    private static final int FORECAST_LOADER_ID = 0;
+
     private ForecastAdapter mForecastAdapter;
 
     public ForecastFragment() {
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(FORECAST_LOADER_ID, savedInstanceState, this);
     }
 
     @Override
@@ -32,15 +43,11 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        final Uri locationUri = WeatherContract.WeatherEntry.buildWeatherLocation(
-                Utility.getPreferredLocation(getActivity()));
-        final String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
-        final Cursor cursor = getActivity().getContentResolver().query(
-                locationUri, null, null, null, sortOrder);
-        final int flags = 0;
-        mForecastAdapter = new ForecastAdapter(getActivity(), cursor, flags);
+        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
         ListView lv = (ListView) rootView.findViewById(R.id.listview_forecast);
-        if (lv==null) { return rootView; }
+        if (lv == null) {
+            return rootView;
+        }
         lv.setAdapter(mForecastAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -80,5 +87,31 @@ public class ForecastFragment extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocation(
+                Utility.getPreferredLocation(getActivity()));
+        final String[] projection = null, selectionArgs = null;
+        final String selection = null;
+        final String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
+        return new CursorLoader(
+                getActivity(),
+                weatherUri,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mForecastAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mForecastAdapter.swapCursor(null);
     }
 }
