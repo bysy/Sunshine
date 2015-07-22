@@ -1,6 +1,9 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,6 +13,29 @@ import android.view.MenuItem;
 
 
 public class DetailActivity extends ActionBarActivity {
+
+    static String getForecastFromUri(Uri locationDateUri, Context context) {
+        String forecast = "";
+        final String[] projection = ForecastFragment.FORECAST_COLUMNS;
+        final String selection = null;
+        final String[] selectionArgs = null;
+        final String sortOrder = null;
+        Cursor cursor = context.getContentResolver().query(
+                locationDateUri,
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder);
+        if (cursor.moveToFirst()) {
+            forecast = ForecastFragment.convertCursorRowToUXFormat(
+                    cursor, Utility.isMetric(context));
+        }
+        cursor.close();
+        if (forecast==null) {
+            forecast = "";
+        }
+        return forecast;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +65,8 @@ public class DetailActivity extends ActionBarActivity {
         final Intent in = getIntent();
         String forecast = null;
         if (in!=null) {
-             forecast = in.getStringExtra(ForecastFragment.FORECAST_STRING);
+            Uri locationDateUri = in.getData();
+            forecast = getForecastFromUri(locationDateUri, this);
         }
         final String hashtag = "#SunshineApp";
         final String shareText =

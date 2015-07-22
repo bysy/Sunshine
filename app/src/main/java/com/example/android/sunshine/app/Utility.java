@@ -17,6 +17,7 @@ package com.example.android.sunshine.app;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 
 import java.text.DateFormat;
@@ -49,5 +50,13 @@ public class Utility {
     static String formatDate(long dateInMillis) {
         Date date = new Date(dateInMillis);
         return DateFormat.getDateInstance().format(date);
+    }
+
+    /**
+     * Prepare the weather high/lows for presentation.
+     */
+    static String formatHighLows(double high, double low, boolean isMetric) {
+        String highLowStr = formatTemperature(high, isMetric) + "/" + formatTemperature(low, isMetric);
+        return highLowStr;
     }
 }

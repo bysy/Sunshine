@@ -24,10 +24,8 @@ import com.example.android.sunshine.app.data.WeatherContract;
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    public static final String FORECAST_STRING = "FORECAST_STRING";
-
     private static final int FORECAST_LOADER_ID = 0;
-    private static final String[] FORECAST_COLUMNS = {
+    static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
             // the content provider joins the location & weather tables in the background
             // (both have an _id column)
@@ -81,10 +79,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         lv.setAdapter(mForecastAdapter);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //String forecast = mForecastAdapter.getItem(position);
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                Uri locationDateUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                        cursor.getString(COL_LOCATION_SETTING),
+                        cursor.getLong(COL_WEATHER_DATE));
                 Intent i = new Intent(getActivity(), DetailActivity.class);
-                //i.putExtra(FORECAST_STRING, forecast);
+                i.setData(locationDateUri);
                 startActivity(i);
             }
         });
@@ -144,5 +145,26 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mForecastAdapter.swapCursor(null);
+    }
+
+    /*
+    This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
+    string.
+ */
+    static String convertCursorRowToUXFormat(Cursor cursor, boolean isMetric) {
+        // get row indices for our cursor
+        final int idx_max_temp = ForecastFragment.COL_WEATHER_MAX_TEMP;
+        final int idx_min_temp = ForecastFragment.COL_WEATHER_MIN_TEMP;
+        final int idx_date = ForecastFragment.COL_WEATHER_DATE;
+        final int idx_short_desc = ForecastFragment.COL_WEATHER_DESC;
+
+        String highAndLow = Utility.formatHighLows(
+                cursor.getDouble(idx_max_temp),
+                cursor.getDouble(idx_min_temp),
+                isMetric);
+
+        return Utility.formatDate(cursor.getLong(idx_date)) +
+                " - " + cursor.getString(idx_short_desc) +
+                " - " + highAndLow;
     }
 }
