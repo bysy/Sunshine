@@ -123,8 +123,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocation(
                 Utility.getPreferredLocation(getActivity()));
-        final String[] projection = null, selectionArgs = null;
+        final String[] projection = FORECAST_COLUMNS;
         final String selection = null;
+        final String[] selectionArgs = null;
         final String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATE + " ASC";
         return new CursorLoader(
                 getActivity(),
