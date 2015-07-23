@@ -1,41 +1,13 @@
 package com.example.android.sunshine.app;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class DetailActivity extends ActionBarActivity {
-
-    static String getForecastFromUri(Uri locationDateUri, Context context) {
-        String forecast = "";
-        final String[] projection = ForecastFragment.FORECAST_COLUMNS;
-        final String selection = null;
-        final String[] selectionArgs = null;
-        final String sortOrder = null;
-        Cursor cursor = context.getContentResolver().query(
-                locationDateUri,
-                projection,
-                selection,
-                selectionArgs,
-                sortOrder);
-        if (cursor.moveToFirst()) {
-            forecast = ForecastFragment.convertCursorRowToUXFormat(
-                    cursor, Utility.isMetric(context));
-        }
-        cursor.close();
-        if (forecast==null) {
-            forecast = "";
-        }
-        return forecast;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,31 +20,7 @@ public class DetailActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_detail, menu);
-        MenuItem shareItem = menu.findItem(R.id.action_share);
-        if (shareItem!=null) {
-            ShareActionProvider shareAP = (ShareActionProvider)
-                    MenuItemCompat.getActionProvider(shareItem);
-            shareAP.setShareIntent(getShareIntent());
-        }
         return true;
-    }
-
-    private Intent getShareIntent() {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        //noinspection deprecation since we target older API
-        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-        shareIntent.setType("text/plain");
-        final Intent in = getIntent();
-        String forecast = null;
-        if (in!=null) {
-            Uri locationDateUri = in.getData();
-            forecast = getForecastFromUri(locationDateUri, this);
-        }
-        final String hashtag = "#SunshineApp";
-        final String shareText =
-                (forecast==null || forecast.isEmpty()) ? hashtag : forecast + " " + hashtag;
-        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
-        return shareIntent;
     }
 
     @Override
