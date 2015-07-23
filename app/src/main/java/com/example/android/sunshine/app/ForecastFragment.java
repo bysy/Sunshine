@@ -92,12 +92,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         return rootView;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateWeather();
-    }
-
     private void updateWeather() {
         FetchWeatherTask fwt = new FetchWeatherTask(getActivity());
         fwt.execute(Utility.getPreferredLocation(getActivity()));
