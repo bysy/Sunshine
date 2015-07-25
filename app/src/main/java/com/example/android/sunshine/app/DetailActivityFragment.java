@@ -31,8 +31,6 @@ public class DetailActivityFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
     private static String TAG = DetailActivityFragment.class.getSimpleName();
     private static final int CURSOR_LOADER = 0;
-    private String mForecast;
-    private ShareActionProvider mShareActionProvider;
 
     static final String[] DETAIL_COLUMNS = {
             WeatherContract.WeatherEntry.COLUMN_DATE,
@@ -55,6 +53,18 @@ public class DetailActivityFragment extends Fragment
     static final int COL_WIND_DEGREES = 7;
     static final int COL_PRESSURE = 8;
 
+    private String mForecast;
+    private ShareActionProvider mShareActionProvider;
+    private TextView mDayView;
+    private TextView mDateView;
+    private TextView mHighView;
+    private TextView mLowView;
+    private ImageView mIconView;
+    private TextView mDescView;
+    private TextView mHumidityView;
+    private TextView mWindView;
+    private TextView mPressureView;
+
     public DetailActivityFragment() {
     }
 
@@ -64,10 +74,29 @@ public class DetailActivityFragment extends Fragment
         setHasOptionsMenu(true);
     }
 
+    boolean areViewsInitialized() {
+        return !(mDayView==null || mDateView==null || mHighView==null || mLowView==null ||
+                mIconView==null || mDescView==null || mHumidityView==null || mWindView==null ||
+                mPressureView==null);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_detail, container, false);
+        final View view = inflater.inflate(R.layout.fragment_detail, container, false);
+        View dc = view.findViewById(R.id.detail_container);
+        mDayView = (TextView) dc.findViewById(R.id.detail_day_textview);
+        mDateView = (TextView) dc.findViewById(R.id.detail_date_textview);
+        mHighView = (TextView) dc.findViewById(R.id.detail_high_temp_textview);
+        mLowView = (TextView) dc.findViewById(R.id.detail_low_temp_textview);
+        mIconView = (ImageView) dc.findViewById(R.id.detail_icon_view);
+        mDescView = (TextView) dc.findViewById(R.id.detail_desc_textview);
+        mHumidityView = (TextView) dc.findViewById(R.id.detail_humidity_textview);
+        mWindView = (TextView) dc.findViewById(R.id.detail_wind_textview);
+        mPressureView = (TextView) dc.findViewById(R.id.detail_pressure_textview);
+        if (!areViewsInitialized()) {
+            Log.e(TAG, "Invalid layout detected");
+        }
         return view;
     }
 
@@ -110,36 +139,26 @@ public class DetailActivityFragment extends Fragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (!data.moveToFirst()) { return; }
-        View view = getActivity().findViewById(R.id.detail_container);
-        TextView dayView = (TextView) view.findViewById(R.id.detail_day_textview);
-        TextView dateView = (TextView) view.findViewById(R.id.detail_date_textview);
-        TextView highView = (TextView) view.findViewById(R.id.detail_high_temp_textview);
-        TextView lowView = (TextView) view.findViewById(R.id.detail_low_temp_textview);
-        ImageView iconView = (ImageView) view.findViewById(R.id.detail_icon_view);
-        TextView descView = (TextView) view.findViewById(R.id.detail_desc_textview);
-        TextView humidityView = (TextView) view.findViewById(R.id.detail_humidity_textview);
-        TextView windView = (TextView) view.findViewById(R.id.detail_wind_textview);
-        TextView pressureView = (TextView) view.findViewById(R.id.detail_pressure_textview);
         Context context = getActivity();
 
         final long dateInMillis = data.getLong(COL_DATE);
-        dayView.setText(Utility.getDayName(context, dateInMillis));
-        dateView.setText(Utility.getFormattedMonthDay(context, dateInMillis));
+        mDayView.setText(Utility.getDayName(context, dateInMillis));
+        mDateView.setText(Utility.getFormattedMonthDay(context, dateInMillis));
         final boolean isMetric = Utility.isMetric(context);
-        highView.setText(Utility.formatTemperature(context, data.getFloat(COL_MAX), isMetric));
-        lowView.setText(Utility.formatTemperature(context, data.getFloat(COL_MIN), isMetric));
+        mHighView.setText(Utility.formatTemperature(context, data.getFloat(COL_MAX), isMetric));
+        mLowView.setText(Utility.formatTemperature(context, data.getFloat(COL_MIN), isMetric));
 
         // TODO: replace with real image
-        iconView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+        mIconView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
 
-        descView.setText(data.getString(COL_DESC));
-        humidityView.setText(
+        mDescView.setText(data.getString(COL_DESC));
+        mHumidityView.setText(
                 String.format(getString(R.string.format_humidity),
                         data.getFloat(COL_HUMIDITY)));
-        windView.setText(
+        mWindView.setText(
                 Utility.getFormattedWind(context,
                         data.getFloat(COL_WIND_SPEED), data.getFloat(COL_WIND_DEGREES)));
-        pressureView.setText(
+        mPressureView.setText(
                 String.format(getString(R.string.format_pressure),
                         data.getFloat(COL_PRESSURE)));
 
