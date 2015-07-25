@@ -64,8 +64,8 @@ public class ForecastAdapter extends CursorAdapter {
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         viewHolder.dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
-        viewHolder.highTemperatureView.setText(Utility.formatTemperature(maxC, isMetric));
-        viewHolder.lowTemperatureView.setText(Utility.formatTemperature(minC, isMetric));
+        viewHolder.highTemperatureView.setText(Utility.formatTemperature(mContext, maxC, isMetric));
+        viewHolder.lowTemperatureView.setText(Utility.formatTemperature(mContext, minC, isMetric));
         // TODO: Load actual image for weatherId
         viewHolder.iconView.setImageDrawable(
                 mContext.getResources().getDrawable(R.drawable.ic_launcher));
