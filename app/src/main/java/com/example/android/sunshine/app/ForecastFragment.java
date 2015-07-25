@@ -145,25 +145,4 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         updateWeather();
         getLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
     }
-
-    /*
-    This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-    string.
- */
-    static String convertCursorRowToUXFormat(Cursor cursor, boolean isMetric) {
-        // get row indices for our cursor
-        final int idx_max_temp = ForecastFragment.COL_WEATHER_MAX_TEMP;
-        final int idx_min_temp = ForecastFragment.COL_WEATHER_MIN_TEMP;
-        final int idx_date = ForecastFragment.COL_WEATHER_DATE;
-        final int idx_short_desc = ForecastFragment.COL_WEATHER_DESC;
-
-        String highAndLow = Utility.formatHighLows(
-                cursor.getDouble(idx_max_temp),
-                cursor.getDouble(idx_min_temp),
-                isMetric);
-
-        return Utility.formatDate(cursor.getLong(idx_date)) +
-                " - " + cursor.getString(idx_short_desc) +
-                " - " + highAndLow;
-    }
 }
