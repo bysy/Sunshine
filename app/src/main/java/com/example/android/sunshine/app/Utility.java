@@ -65,7 +65,7 @@ public class Utility {
             return getDayName(context, dateInMillis);
         } else {
             // Otherwise, use the form "Mon Jun 3"
-            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
+            SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE, MMM d");
             return shortenedDateFormat.format(dateInMillis);
         }
     }
@@ -109,8 +109,8 @@ public class Utility {
     public static String getFormattedMonthDay(Context context, long dateInMillis ) {
         Time time = new Time();
         time.setToNow();
-        SimpleDateFormat dbDateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
-        SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
+        //SimpleDateFormat dbDateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
+        SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM d");
         String monthDayString = monthDayFormat.format(dateInMillis);
         return monthDayString;
     }
