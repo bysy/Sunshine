@@ -17,6 +17,20 @@ import com.example.android.sunshine.app.data.WeatherContract;
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
 public class ForecastAdapter extends CursorAdapter {
+    private static final int VIEW_TYPE_TODAY = 0;
+    private static final int VIEW_TYPE_FUTURE_DAY = 1;
+    private static final int VIEW_TYPE_COUNT = 2;
+
+    @Override
+    public int getItemViewType(int position) {
+        return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return VIEW_TYPE_COUNT;
+    }
+
     /** Note that the Cursor must be to a projection as defined in ForecastFragment */
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -27,9 +41,10 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_forecast, parent, false);
-
-        return view;
+        final int viewResource =
+                getItemViewType(cursor.getPosition())==VIEW_TYPE_FUTURE_DAY ?
+                        R.layout.list_item_forecast : R.layout.list_item_forecast_today;
+        return LayoutInflater.from(context).inflate(viewResource, parent, false);
     }
 
     /*
