@@ -44,7 +44,9 @@ public class ForecastAdapter extends CursorAdapter {
         final int viewResource =
                 getItemViewType(cursor.getPosition())==VIEW_TYPE_FUTURE_DAY ?
                         R.layout.list_item_forecast : R.layout.list_item_forecast_today;
-        return LayoutInflater.from(context).inflate(viewResource, parent, false);
+        View view = LayoutInflater.from(context).inflate(viewResource, parent, false);
+        view.setTag(new ViewHolder(view));
+        return view;
     }
 
     /*
@@ -59,25 +61,38 @@ public class ForecastAdapter extends CursorAdapter {
         final String desc = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
 
         final boolean isMetric = Utility.isMetric(mContext);
+        final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        TextView dateView = (TextView) view.findViewById(R.id.list_item_date_textview);
-        if (dateView!=null) {
-            dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
+        viewHolder.dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
+        viewHolder.highTemperatureView.setText(Utility.formatTemperature(maxC, isMetric));
+        viewHolder.lowTemperatureView.setText(Utility.formatTemperature(minC, isMetric));
+        // TODO: Load actual image for weatherId
+        viewHolder.iconView.setImageDrawable(
+                mContext.getResources().getDrawable(R.drawable.ic_launcher));
+        viewHolder.descriptionView.setText(desc);
+    }
+
+    /** Cache subviews of list item view. */
+    class ViewHolder {
+        final ImageView iconView;
+        final TextView dateView;
+        final TextView descriptionView;
+        final TextView highTemperatureView;
+        final TextView lowTemperatureView;
+
+        ViewHolder(View item) {
+            iconView = (ImageView) item.findViewById(R.id.list_item_icon);
+            dateView = (TextView) item.findViewById(R.id.list_item_date_textview);
+            descriptionView = (TextView) item.findViewById(R.id.list_item_forecast_textview);
+            highTemperatureView = (TextView) item.findViewById(R.id.list_item_high_textview);
+            lowTemperatureView = (TextView) item.findViewById(R.id.list_item_low_textview);
+            if (iconView==null ||
+                    dateView==null ||
+                    descriptionView==null ||
+                    highTemperatureView==null ||
+                    lowTemperatureView==null) {
+                throw new IllegalArgumentException("Incompatible view");
+            }
         }
-        TextView maxTemperatureView = (TextView) view.findViewById(R.id.list_item_high_textview);
-        if (maxTemperatureView!=null) {
-            maxTemperatureView.setText(Utility.formatTemperature(maxC, isMetric));
-        }
-        TextView minTemperatureView = (TextView) view.findViewById(R.id.list_item_low_textview);
-        if (minTemperatureView!=null) {
-            minTemperatureView.setText(Utility.formatTemperature(minC, isMetric));
-        }
-        ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
-        if (iconView!=null) {
-            // TODO: Load actual image for weatherId
-            iconView.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_launcher));
-        }
-        TextView descView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
-        if (descView!=null) { descView.setText(desc); }
     }
 }
