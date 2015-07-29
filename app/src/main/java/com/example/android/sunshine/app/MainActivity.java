@@ -36,8 +36,11 @@ public class MainActivity extends ActionBarActivity {
         super.onResume();
         Log.v(TAG, "onResume");
         final String curLocation = Utility.getPreferredLocation(this);
-        if (curLocation==null) { return; }
-        if (!mLocation.equals(Utility.getPreferredLocation(this))) {
+        if (curLocation==null) {
+            Log.e(TAG, "Couldn't find preferred location.");
+            return;
+        }
+        if (!mLocation.equals(curLocation)) {
             Log.v(TAG, "Location change detected.");
             mLocation = curLocation;
             ForecastFragment ff = (ForecastFragment) getSupportFragmentManager()
