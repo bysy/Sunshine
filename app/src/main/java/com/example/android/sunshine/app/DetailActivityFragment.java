@@ -148,8 +148,9 @@ public class DetailActivityFragment extends Fragment
         mHighView.setText(Utility.formatTemperature(context, data.getFloat(COL_MAX), isMetric));
         mLowView.setText(Utility.formatTemperature(context, data.getFloat(COL_MIN), isMetric));
 
-        // TODO: replace with real image
-        mIconView.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
+        final int weatherId = data.getInt(COL_WEATHER_ID);
+        final int weatherResource = Utility.getArtResourceForWeatherCondition(weatherId);
+        mIconView.setImageDrawable(getResources().getDrawable(weatherResource));
 
         mDescView.setText(data.getString(COL_DESC));
         mHumidityView.setText(

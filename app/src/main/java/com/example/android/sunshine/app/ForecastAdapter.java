@@ -66,9 +66,14 @@ public class ForecastAdapter extends CursorAdapter {
         viewHolder.dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
         viewHolder.highTemperatureView.setText(Utility.formatTemperature(mContext, maxC, isMetric));
         viewHolder.lowTemperatureView.setText(Utility.formatTemperature(mContext, minC, isMetric));
-        // TODO: Load actual image for weatherId
+
+        // Load art for today, icons for other days
+        final int weatherResource =
+                (getItemViewType(cursor.getPosition()))==VIEW_TYPE_TODAY ?
+                Utility.getArtResourceForWeatherCondition(weatherId) :
+                        Utility.getIconResourceForWeatherCondition(weatherId);
         viewHolder.iconView.setImageDrawable(
-                mContext.getResources().getDrawable(R.drawable.ic_launcher));
+                mContext.getResources().getDrawable(weatherResource));
         viewHolder.descriptionView.setText(desc);
     }
 
