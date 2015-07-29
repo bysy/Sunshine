@@ -5,16 +5,21 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
     private String mLocation;
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +28,18 @@ public class MainActivity extends ActionBarActivity {
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         mLocation = Utility.getPreferredLocation(this);
         setContentView(R.layout.activity_main);
+        View detailView = findViewById(R.id.detail_fragment_container);
+        if (detailView==null) {
+            mTwoPane = false;
+            Log.d(TAG, "Single-pane layout.");
+        } else {
+            mTwoPane = true;
+            Log.d(TAG, "Double-pane layout.");
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.replace(R.id.detail_fragment_container, new DetailActivityFragment(), DETAIL_FRAGMENT_TAG);
+            ft.commit();
+        }
     }
 
     @Override

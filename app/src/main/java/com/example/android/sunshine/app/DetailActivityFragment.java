@@ -128,7 +128,7 @@ public class DetailActivityFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Intent in = getActivity().getIntent();
-        if (in==null) { return null; }
+        if (in==null || in.getData()==null) { return null; }
         final String[] projection = DETAIL_COLUMNS;
         return new CursorLoader(
                 getActivity(),
