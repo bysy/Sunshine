@@ -14,8 +14,6 @@ import android.view.MenuItem;
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String FORECAST_FRAGMENT = "FORECAST_FRAGMENT";
-
     private String mLocation;
 
     @Override
@@ -25,11 +23,6 @@ public class MainActivity extends ActionBarActivity {
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         mLocation = Utility.getPreferredLocation(this);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment(), FORECAST_FRAGMENT)
-                    .commit();
-        }
     }
 
     @Override
@@ -48,8 +41,11 @@ public class MainActivity extends ActionBarActivity {
             Log.v(TAG, "Location change detected.");
             mLocation = curLocation;
             ForecastFragment ff = (ForecastFragment) getSupportFragmentManager()
-                    .findFragmentByTag(FORECAST_FRAGMENT);
-            if (ff==null) { return; }
+                    .findFragmentById(R.id.fragment_forecast);
+            if (ff==null) {
+                Log.e(TAG, "Couldn't find forecast layout.");
+                return;
+            }
             ff.onLocationChanged();
         }
     }
