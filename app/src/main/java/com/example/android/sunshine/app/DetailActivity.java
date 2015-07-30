@@ -15,9 +15,16 @@ public class DetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        Intent in = getIntent();
+        DetailActivityFragment detailFragment = new DetailActivityFragment();
+        if (in!=null && in.getData()!=null) {
+            Bundle args = new Bundle();
+            args.putParcelable(DetailActivityFragment.URI_KEY, in.getData());
+            detailFragment.setArguments(args);
+        }
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.detail_fragment_container, new DetailActivityFragment());
+        ft.replace(R.id.detail_fragment_container, detailFragment);
         ft.commit();
     }
 

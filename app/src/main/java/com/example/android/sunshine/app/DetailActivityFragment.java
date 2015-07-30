@@ -3,6 +3,7 @@ package com.example.android.sunshine.app;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -29,7 +30,8 @@ import com.example.android.sunshine.app.data.WeatherContract;
  */
 public class DetailActivityFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static String TAG = DetailActivityFragment.class.getSimpleName();
+    static final String URI_KEY = "URI_KEY";
+    private static final String TAG = DetailActivityFragment.class.getSimpleName();
     private static final int CURSOR_LOADER = 0;
 
     static final String[] DETAIL_COLUMNS = {
@@ -127,14 +129,19 @@ public class DetailActivityFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent in = getActivity().getIntent();
-        if (in==null || in.getData()==null) { return null; }
+        Uri dateLocationUri = getDateLocationUri();
+        if (dateLocationUri==null) { return null; }
         final String[] projection = DETAIL_COLUMNS;
         return new CursorLoader(
                 getActivity(),
-                in.getData(),
+                dateLocationUri,
                 projection,
                 null, null, null);
+    }
+
+    private Uri getDateLocationUri() {
+        if (getArguments()==null) { return null; }
+        return getArguments().getParcelable(URI_KEY);
     }
 
     @Override
