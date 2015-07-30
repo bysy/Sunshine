@@ -1,10 +1,10 @@
 package com.example.android.sunshine.app;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +24,7 @@ import com.example.android.sunshine.app.data.WeatherContract;
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    private static final String TAG = ForecastFragment.class.getSimpleName();
     private static final int FORECAST_LOADER_ID = 0;
     static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -57,6 +58,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private ForecastAdapter mForecastAdapter;
 
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri dateUri);
+    }
+
     public ForecastFragment() {
     }
 
@@ -84,9 +97,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 Uri locationDateUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
                         cursor.getString(COL_LOCATION_SETTING),
                         cursor.getLong(COL_WEATHER_DATE));
-                Intent i = new Intent(getActivity(), DetailActivity.class);
-                i.setData(locationDateUri);
-                startActivity(i);
+                if (getActivity() instanceof Callback) {
+                    ((Callback) getActivity()).onItemSelected(locationDateUri);
+                } else {
+                    Log.w(TAG, "Parent activity doesn't implement Callback.");
+                }
             }
         });
         return rootView;

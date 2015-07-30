@@ -14,7 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String DETAIL_FRAGMENT_TAG = "DETAIL_FRAGMENT_TAG";
@@ -124,5 +124,24 @@ public class MainActivity extends ActionBarActivity {
         final String location = settings.getString(locKey, "");
         final Uri uri = Uri.parse("geo:0,0?q="+Uri.encode(location));
         return uri;
+    }
+
+    @Override
+    public void onItemSelected(Uri dateUri) {
+        // when running on a phone, start the detail activity. On larger screens, load the detail fragment
+        if (!mTwoPane) {
+            Intent i = new Intent(this, DetailActivity.class);
+            i.setData(dateUri);
+            startActivity(i);
+         } else {
+            DetailActivityFragment detailFragment = new DetailActivityFragment();
+            Bundle args = new Bundle();
+            args.putParcelable(DetailActivityFragment.URI_KEY, dateUri);
+            detailFragment.setArguments(args);
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.replace(R.id.detail_fragment_container, detailFragment, DETAIL_FRAGMENT_TAG);
+            ft.commit();
+        }
     }
 }
