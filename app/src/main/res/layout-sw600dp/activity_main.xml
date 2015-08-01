@@ -13,7 +13,7 @@
         android:name="com.example.android.sunshine.app.ForecastFragment"
         android:id="@+id/fragment_forecast"
         android:layout_weight="2"
-        tools:layout="@layout/fragment_main" />
+        tools:layout="@layout/fragment_forecast" />
 
     <FrameLayout
         android:layout_width="0dp"

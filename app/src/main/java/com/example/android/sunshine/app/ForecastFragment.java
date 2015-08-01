@@ -83,7 +83,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_forecast, container, false);
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
         ListView lv = (ListView) rootView.findViewById(R.id.listview_forecast);
         if (lv == null) {
