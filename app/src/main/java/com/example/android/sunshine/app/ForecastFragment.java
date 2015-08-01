@@ -25,6 +25,7 @@ import com.example.android.sunshine.app.data.WeatherContract;
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = ForecastFragment.class.getSimpleName();
+    private static final String BUNDLE_POSITION_KEY = "BUNDLE_POSITION_KEY";
     private static final int FORECAST_LOADER_ID = 0;
     static final String[] FORECAST_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -57,6 +58,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     static final int COL_COORD_LONG = 8;
 
     private ForecastAdapter mForecastAdapter;
+    private ListView mListView;
+    private int mPosition = ListView.INVALID_POSITION;  // for Tablet UI
 
     /**
      * A callback interface that all activities containing this fragment must
@@ -93,6 +96,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
+                mPosition = position;
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 Uri locationDateUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
                         cursor.getString(COL_LOCATION_SETTING),
@@ -104,7 +108,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 }
             }
         });
+        mListView = lv;
+        // Restore state
+        if (savedInstanceState!=null) {
+            mPosition = savedInstanceState.getInt(BUNDLE_POSITION_KEY, 0);
+        }
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(BUNDLE_POSITION_KEY, mPosition);
     }
 
     private void updateWeather() {
@@ -149,6 +164,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mForecastAdapter.swapCursor(data);
+        if (mPosition!=ListView.INVALID_POSITION) {
+            mListView.smoothScrollToPosition(mPosition);  // for tablet UI
+        }
     }
 
     @Override
