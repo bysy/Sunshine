@@ -146,8 +146,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocation(
-                Utility.getPreferredLocation(getActivity()));
+        final Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(
+                Utility.getPreferredLocation(getActivity()),
+                System.currentTimeMillis());
         final String[] projection = FORECAST_COLUMNS;
         final String selection = null;
         final String[] selectionArgs = null;
