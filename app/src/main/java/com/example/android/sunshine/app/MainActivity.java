@@ -36,12 +36,14 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             mTwoPane = true;
             Log.d(TAG, "Double-pane layout.");
             FragmentManager fm = getSupportFragmentManager();
-            ForecastFragment forecastFragment =
-                    (ForecastFragment) fm.findFragmentById(R.id.fragment_forecast);
-            forecastFragment.setUseTodayLayout(false);
             FragmentTransaction ft = fm.beginTransaction();
             ft.replace(R.id.detail_fragment_container, new DetailActivityFragment(), DETAIL_FRAGMENT_TAG);
             ft.commit();
+        }
+        ForecastFragment forecastFragment = (ForecastFragment)
+                getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
+        if (forecastFragment!=null) {
+            forecastFragment.setUseTodayLayout(!mTwoPane);
         }
     }
 
