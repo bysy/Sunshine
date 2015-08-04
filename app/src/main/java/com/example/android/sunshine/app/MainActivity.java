@@ -68,7 +68,7 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             ForecastFragment ff = (ForecastFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.fragment_forecast);
             if (ff==null) {
-                Log.e(TAG, "Couldn't find forecast layout.");
+                Log.e(TAG, "Couldn't find forecast fragment.");
                 return;
             }
             ff.onLocationChanged();
