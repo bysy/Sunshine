@@ -5,13 +5,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 
 public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback {
@@ -28,18 +25,30 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
         mLocation = Utility.getPreferredLocation(this);
         setContentView(R.layout.activity_main);
-        View detailView = findViewById(R.id.detail_fragment_container);
-        if (detailView==null) {
-            mTwoPane = false;
-            Log.d(TAG, "Single-pane layout.");
-        } else {
-            mTwoPane = true;
-            Log.d(TAG, "Double-pane layout.");
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            ft.replace(R.id.detail_fragment_container, new DetailActivityFragment(), DETAIL_FRAGMENT_TAG);
-            ft.commit();
+        mTwoPane = findViewById(R.id.detail_fragment_container)!=null;
+        logLayout();
+        if (mTwoPane) {
+            replaceDetailFragment(new DetailActivityFragment());
         }
+        configureForecastLayout();
+    }
+
+    private void logLayout() {
+        if (mTwoPane) {
+            Log.d(TAG, "Double-pane layout.");
+        } else {
+            Log.d(TAG, "Single-pane layout.");
+        }
+    }
+
+    private void replaceDetailFragment(DetailActivityFragment detailFragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.detail_fragment_container, detailFragment, DETAIL_FRAGMENT_TAG)
+                .commit();
+    }
+
+    private void configureForecastLayout() {
         ForecastFragment forecastFragment = (ForecastFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
         if (forecastFragment!=null) {
@@ -65,14 +74,18 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         if (!mLocation.equals(curLocation)) {
             Log.v(TAG, "Location change detected.");
             mLocation = curLocation;
-            ForecastFragment ff = (ForecastFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.fragment_forecast);
-            if (ff==null) {
-                Log.e(TAG, "Couldn't find forecast fragment.");
-                return;
-            }
-            ff.onLocationChanged();
+            handleLocationChange();
         }
+    }
+
+    private void handleLocationChange() {
+        ForecastFragment ff = (ForecastFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_forecast);
+        if (ff==null) {
+            Log.e(TAG, "Couldn't find forecast fragment.");
+            return;
+        }
+        ff.onLocationChanged();
     }
 
     @Override
@@ -143,10 +156,7 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             Bundle args = new Bundle();
             args.putParcelable(DetailActivityFragment.URI_KEY, dateUri);
             detailFragment.setArguments(args);
-            FragmentManager fm = getSupportFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            ft.replace(R.id.detail_fragment_container, detailFragment, DETAIL_FRAGMENT_TAG);
-            ft.commit();
+            replaceDetailFragment(detailFragment);
         }
     }
 }
