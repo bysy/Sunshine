@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -29,6 +30,9 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         logLayout();
         if (mTwoPane) {
             replaceDetailFragment(new DetailActivityFragment());
+        } else {
+            ActionBar ab = getSupportActionBar();
+            if (ab!=null) { ab.setElevation(0.0f); }
         }
         configureForecastLayout();
     }
