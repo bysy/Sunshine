@@ -87,6 +87,10 @@ public class DetailActivityFragment extends Fragment
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_detail, container, false);
         View dc = view.findViewById(R.id.detail_container);
+        if (dc==null) {
+            Log.w(TAG, "Layout is missing detail_container");
+            dc = view;
+        }
         mDayView = (TextView) dc.findViewById(R.id.detail_day_textview);
         mDateView = (TextView) dc.findViewById(R.id.detail_date_textview);
         mHighView = (TextView) dc.findViewById(R.id.detail_high_temp_textview);
