@@ -61,6 +61,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;  // for Tablet UI
 
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        mForecastAdapter.setUseTodayLayout(useTodayLayout);
+    }
+
     /**
      * A callback interface that all activities containing this fragment must
      * implement. This mechanism allows activities to be notified of item
