@@ -60,9 +60,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ForecastAdapter mForecastAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;  // for Tablet UI
+    private boolean mUseTodayLayout = true;
 
     public void setUseTodayLayout(boolean useTodayLayout) {
-        mForecastAdapter.setUseTodayLayout(useTodayLayout);
+        mUseTodayLayout = useTodayLayout;
+        if (mForecastAdapter!=null) {
+            mForecastAdapter.setUseTodayLayout(useTodayLayout);
+        }
     }
 
     /**
@@ -92,6 +96,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.fragment_forecast, container, false);
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
         ListView lv = (ListView) rootView.findViewById(R.id.listview_forecast);
         if (lv == null) {
             return rootView;
