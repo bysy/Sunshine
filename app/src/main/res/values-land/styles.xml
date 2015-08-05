@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="DetailHighTemperature" parent="DetailTemperature">
+        <item name="android:textSize">72sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="DetailLowTemperature" parent="DetailTemperature">
+        <item name="android:textSize">36sp</item>
+        <item name="android:textColor">@color/medium_dark_grey</item>
+    </style>
+</resources>

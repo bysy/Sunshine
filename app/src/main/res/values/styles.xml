@@ -4,11 +4,17 @@
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/sunshine_blue</item>
         <item name="colorPrimaryDark">@color/sunshine_dark_blue</item>
+        <!-- Remove shadow below ActionBar on pre-21 devices. No effect on 21+ -->
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
     <!-- Main activity theme. -->
     <style name="ForecastTheme" parent="AppTheme">
         <item name="actionBarStyle">@style/ActionBar.Solid.Sunshine.NoTitle</item>
+    </style>
+
+    <!-- Settings activity theme. -->
+    <style name="SettingsTheme" parent="AppTheme">
     </style>
 
     <!-- main activity action bar styles -->
@@ -18,5 +24,36 @@
     </style>
 
     <style name="ForecastListStyle" parent="AppTheme" />
+
+    <style name="TodayText" parent="AppTheme">
+         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <!-- see v16 -->
+    <style name="TodayItemText" parent="TodayText" />
+    <style name="TodayItemTemperature" parent="TodayText">
+
+    </style>
+
+    <style name="DetailTemperature">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
+    <!-- Phone styles. Overridden for smaller fonts in landscape when sw < 600 -->
+    <style name="DetailHighTemperature" parent="DetailTemperature">
+        <item name="android:textSize">96sp</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="DetailLowTemperature" parent="DetailTemperature">
+        <item name="android:textSize">48sp</item>
+        <item name="android:textColor">@color/medium_dark_grey</item>
+    </style>
+
+    <style name="DetailMeteorologicalText">
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textAppearance">?android:textAppearanceLarge</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
 
 </resources>
