@@ -41,6 +41,12 @@
 
     <!-- Humidity format CHAR LIMIT=25]-->
     <string name="format_humidity">Humidity: <xliff:g id="humidity">%1.0f</xliff:g> %%</string>
+
+    <!-- Accessibility -->
+    <string name="format_high_temperature_description">High <xliff:g id="temperature">%1$s</xliff:g></string>
+    <string name="format_low_temperature_description">Low <xliff:g id="temperature">%1$s</xliff:g></string>
+    <string name="format_forecast_item_description"><xliff:g id="day">%1$s</xliff:g>, <xliff:g id="weatherDescription">%2$s</xliff:g>, high <xliff:g id="highTemperature">%3$s</xliff:g>, low <xliff:g id="lowTemperature">%4$s</xliff:g></string>
+
     <!-- Do not translate the following strings -->
     <string name="pref_location_key">location</string>
     <string name="pref_location_default">94043,usa</string>

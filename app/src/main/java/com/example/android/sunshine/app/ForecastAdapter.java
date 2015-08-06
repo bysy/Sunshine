@@ -62,11 +62,18 @@ public class ForecastAdapter extends CursorAdapter {
         final String desc = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
 
         final boolean isMetric = Utility.isMetric(mContext);
+        final String highTemperature = Utility.formatTemperature(mContext, maxC, isMetric);
+        final String lowTemperature = Utility.formatTemperature(mContext, minC, isMetric);
+        final String friendlyDay = Utility.getFriendlyDayString(mContext, dateInMillis);
+
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        viewHolder.dateView.setText(Utility.getFriendlyDayString(mContext, dateInMillis));
-        viewHolder.highTemperatureView.setText(Utility.formatTemperature(mContext, maxC, isMetric));
-        viewHolder.lowTemperatureView.setText(Utility.formatTemperature(mContext, minC, isMetric));
+        view.setContentDescription(String.format(
+                mContext.getString(R.string.format_forecast_item_description),
+                        friendlyDay, desc, highTemperature, lowTemperature));
+        viewHolder.dateView.setText(friendlyDay);
+        viewHolder.highTemperatureView.setText(highTemperature);
+        viewHolder.lowTemperatureView.setText(lowTemperature);
 
         // Load art for today, icons for other days
         final int weatherResource =

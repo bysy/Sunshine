@@ -157,8 +157,14 @@ public class DetailActivityFragment extends Fragment
         mDayView.setText(Utility.getDayName(context, dateInMillis));
         mDateView.setText(Utility.getFormattedMonthDay(context, dateInMillis));
         final boolean isMetric = Utility.isMetric(context);
-        mHighView.setText(Utility.formatTemperature(context, data.getFloat(COL_MAX), isMetric));
-        mLowView.setText(Utility.formatTemperature(context, data.getFloat(COL_MIN), isMetric));
+        final String highTemperature = Utility.formatTemperature(context, data.getFloat(COL_MAX), isMetric);
+        mHighView.setText(highTemperature);
+        mHighView.setContentDescription(String.format(
+                context.getString(R.string.format_high_temperature_description), highTemperature));
+        final String lowTemperature = Utility.formatTemperature(context, data.getFloat(COL_MIN), isMetric);
+        mLowView.setText(lowTemperature);
+        mLowView.setContentDescription(String.format(
+                context.getString(R.string.format_low_temperature_description), lowTemperature));
 
         final int weatherId = data.getInt(COL_WEATHER_ID);
         final int weatherResource = Utility.getArtResourceForWeatherCondition(weatherId);
