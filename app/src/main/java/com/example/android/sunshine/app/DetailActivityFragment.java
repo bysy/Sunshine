@@ -185,10 +185,9 @@ public class DetailActivityFragment extends Fragment
         maybeSetShareIntent();
     }
 
-    /*
-    This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-    string.
- */
+    /**
+     * Create a short summary of the weather.
+     */
     static String convertCursorRowToUXFormat(Cursor cursor, boolean isMetric) {
         // get row indices for our cursor
         final int idx_max_temp = COL_MAX;

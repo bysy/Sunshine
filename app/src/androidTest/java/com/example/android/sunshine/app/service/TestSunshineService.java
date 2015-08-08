@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.sunshine.app;
+package com.example.android.sunshine.app.service;
 
 import android.annotation.TargetApi;
 import android.database.Cursor;
-import android.test.AndroidTestCase;
+import android.test.ServiceTestCase;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 
-public class TestFetchWeatherTask extends AndroidTestCase{
+public class TestSunshineService extends ServiceTestCase<SunshineService> {
     static final String ADD_LOCATION_SETTING = "Sunnydale, CA";
     static final String ADD_LOCATION_CITY = "Sunnydale";
     static final double ADD_LOCATION_LAT = 34.425833;
     static final double ADD_LOCATION_LON = -119.714167;
+
+    /**
+     * Constructor
+     */
+    public TestSunshineService() {
+        super(SunshineService.class);
+    }
 
     /*
         Students: uncomment testAddLocation after you have written the AddLocation function.
@@ -39,8 +46,7 @@ public class TestFetchWeatherTask extends AndroidTestCase{
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
                 new String[]{ADD_LOCATION_SETTING});
 
-        FetchWeatherTask fwt = new FetchWeatherTask(getContext());
-        long locationId = fwt.addLocation(ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
+        long locationId = SunshineService.addLocation(getContext(), ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
                 ADD_LOCATION_LAT, ADD_LOCATION_LON);
 
         // does addLocation return a valid record ID?
@@ -85,7 +91,8 @@ public class TestFetchWeatherTask extends AndroidTestCase{
                     locationCursor.moveToNext());
 
             // add the location again
-            long newLocationId = fwt.addLocation(ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
+            long newLocationId = SunshineService.addLocation(getContext(),
+                    ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
                     ADD_LOCATION_LAT, ADD_LOCATION_LON);
 
             assertEquals("Error: inserting a location again should return the same ID",
