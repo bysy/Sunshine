@@ -16,6 +16,7 @@
 package com.example.android.sunshine.app.service;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.database.Cursor;
 import android.test.ServiceTestCase;
 
@@ -34,10 +35,15 @@ public class TestSunshineService extends ServiceTestCase<SunshineService> {
         super(SunshineService.class);
     }
 
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
+
     /*
-        Students: uncomment testAddLocation after you have written the AddLocation function.
-        This test will only run on API level 11 and higher because of a requirement in the
-        content provider.
+                Students: uncomment testAddLocation after you have written the AddLocation function.
+                This test will only run on API level 11 and higher because of a requirement in the
+                content provider.
      */
     @TargetApi(11)
     public void testAddLocation() {
@@ -46,7 +52,11 @@ public class TestSunshineService extends ServiceTestCase<SunshineService> {
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
                 new String[]{ADD_LOCATION_SETTING});
 
-        long locationId = SunshineService.addLocation(getContext(), ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
+        // Create service. It's destroyed in `super.tearDown()`
+        startService(new Intent(mContext, SunshineService.class));
+        SunshineService svc = getService();
+
+        long locationId = svc.addLocation(ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
                 ADD_LOCATION_LAT, ADD_LOCATION_LON);
 
         // does addLocation return a valid record ID?
@@ -91,8 +101,7 @@ public class TestSunshineService extends ServiceTestCase<SunshineService> {
                     locationCursor.moveToNext());
 
             // add the location again
-            long newLocationId = SunshineService.addLocation(getContext(),
-                    ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
+            long newLocationId = svc.addLocation(ADD_LOCATION_SETTING, ADD_LOCATION_CITY,
                     ADD_LOCATION_LAT, ADD_LOCATION_LON);
 
             assertEquals("Error: inserting a location again should return the same ID",
