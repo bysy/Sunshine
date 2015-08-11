@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -22,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -29,6 +33,7 @@ import java.util.Vector;
  */
 public class SunshineService extends IntentService {
     public static final String LOCATION_SETTING = "LOCATION_SETTING";
+    private final String LOG_TAG = SunshineService.class.getSimpleName();
 
     public SunshineService() {
         super(SunshineService.class.getSimpleName());
@@ -39,10 +44,8 @@ public class SunshineService extends IntentService {
         if (intent==null) { return; }
         final String location = intent.getStringExtra(LOCATION_SETTING);
         if (location==null || location.isEmpty()) { return; }
-        doInBackground(location);
+        update(location);
     }
-
-    private final String LOG_TAG = SunshineService.class.getSimpleName();
 
 
     /**
@@ -66,6 +69,7 @@ public class SunshineService extends IntentService {
                 WeatherContract.LocationEntry.CONTENT_URI, null,
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
                 new String[]{locationSetting}, null);
+        //noinspection TryFinallyCanBeTryWithResources  (API 19+)
         try {
             if (cursor.moveToFirst()) {
                 final int _idIdx = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
@@ -91,9 +95,11 @@ public class SunshineService extends IntentService {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr,
-                                            String locationSetting)
-            throws JSONException {
+    @SuppressWarnings("deprecation")  // Uses Time for backwards compatibility
+    @NonNull
+    private List<ContentValues> parseJsonForecast(
+            String forecastJsonStr,
+            String locationSetting) {
 
         // Now we have a String representing the complete forecast in JSON Format.
         // Fortunately parsing is easy:  constructor takes the JSON string and converts it
@@ -141,7 +147,7 @@ public class SunshineService extends IntentService {
             long locationId = addLocation(locationSetting, cityName, cityLatitude, cityLongitude);
 
             // Insert the new weather information into the database
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(weatherArray.length());
+            Vector<ContentValues> cVVector = new Vector<>(weatherArray.length());
 
             // OWM returns daily forecasts based upon the local time of the city that is being
             // asked for, which means that we need to know the GMT offset to translate this data
@@ -214,30 +220,35 @@ public class SunshineService extends IntentService {
                 cVVector.add(weatherValues);
             }
 
-            // add to database
-            if ( cVVector.size() > 0 ) {
-                // Student: call bulkInsert to add the weatherEntries to the database here
-                getContentResolver().bulkInsert(
-                        WeatherContract.WeatherEntry.CONTENT_URI,
-                        cVVector.toArray(new ContentValues[]{}));
-            }
-
-            Log.d(LOG_TAG, "Sunshine weather update complete: " + cVVector.size() + " Inserted");
+            return cVVector;
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-        return null;
+
+        return Collections.emptyList();
     }
-    protected Void doInBackground(String... params) {
 
-        // If there's no zip code, there's nothing to look up.  Verify size of params.
-        if (params.length == 0) {
-            return null;
+    /** Update the weather data for location. */
+    private void update(String locationQuery) {
+        String forecastJsonStr = retrieveForecastJsonString(locationQuery);
+        if (forecastJsonStr==null) return;
+
+        List<ContentValues> forecast = parseJsonForecast(forecastJsonStr, locationQuery);
+        // add to database
+        if (!forecast.isEmpty()) {
+            getContentResolver().bulkInsert(
+                    WeatherContract.WeatherEntry.CONTENT_URI,
+                    forecast.toArray(new ContentValues[forecast.size()]));
+            Log.d(LOG_TAG, "Sunshine weather update complete: " + forecast.size() + " inserted");
+        } else {
+            Log.d(LOG_TAG, "Sunshine weather update failed");
         }
-        String locationQuery = params[0];
+    }
 
+    @Nullable
+    private String retrieveForecastJsonString(String locationQuery) {
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -262,7 +273,7 @@ public class SunshineService extends IntentService {
             final String DAYS_PARAM = "cnt";
 
             Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, params[0])
+                    .appendQueryParameter(QUERY_PARAM, locationQuery)
                     .appendQueryParameter(FORMAT_PARAM, format)
                     .appendQueryParameter(UNITS_PARAM, units)
                     .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
@@ -277,7 +288,7 @@ public class SunshineService extends IntentService {
 
             // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             if (inputStream == null) {
                 // Nothing to do.
                 return null;
@@ -289,7 +300,7 @@ public class SunshineService extends IntentService {
                 // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
                 // But it does make debugging a *lot* easier if you print out the completed
                 // buffer for debugging.
-                buffer.append(line + "\n");
+                buffer.append(line).append("\n");
             }
 
             if (buffer.length() == 0) {
@@ -297,9 +308,10 @@ public class SunshineService extends IntentService {
                 return null;
             }
             forecastJsonStr = buffer.toString();
+
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attemping
+            // If the code didn't successfully get the weather data, there's no point in attempting
             // to parse it.
             return null;
 
@@ -315,13 +327,6 @@ public class SunshineService extends IntentService {
                 }
             }
         }
-
-        try {
-            getWeatherDataFromJson(forecastJsonStr, locationQuery);
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage(), e);
-            e.printStackTrace();
-        }
-        return null;
+        return forecastJsonStr;
     }
 }
