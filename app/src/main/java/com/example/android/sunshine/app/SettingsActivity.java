@@ -2,7 +2,10 @@
 
 package com.example.android.sunshine.app;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -37,11 +40,19 @@ public class SettingsActivity extends PreferenceActivity
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
     }
 
-    /**
-     * Attaches a listener so the summary is always updated with the preference value.
-     * Also fires the listener once, to initialize the summary (so it shows up before the value
-     * is changed.)
-     */
+    /** Ensure that we go back to existing main activity when up is pressed in settings. */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public Intent getParentActivityIntent() {
+        Intent pai = super.getParentActivityIntent();
+        return pai==null ? null : pai.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    }
+
+        /**
+         * Attaches a listener so the summary is always updated with the preference value.
+         * Also fires the listener once, to initialize the summary (so it shows up before the value
+         * is changed.)
+         */
     private void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(this);
