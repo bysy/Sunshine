@@ -37,6 +37,7 @@ public class SunshineService extends IntentService {
     public static final String LOCATION_SETTING = "LOCATION_SETTING";
     private static final String LOG_TAG = SunshineService.class.getSimpleName();
 
+   /** Provide a broadcast receiver to start the location update service. */
     public static class AlarmReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -120,6 +121,11 @@ public class SunshineService extends IntentService {
         }
     }
 
+    /**
+     * Retrieve forecast JSON data from OpenWeatherMap.
+     * @param locationQuery Location is sent as is to OWM.
+     *                      Recommended format: "zip-code,country"
+     */
     @Nullable
     private String retrieveForecastJsonString(String locationQuery) {
         // These two need to be declared outside the try/catch
