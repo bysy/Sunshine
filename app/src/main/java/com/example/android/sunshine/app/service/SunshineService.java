@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
 
 import org.json.JSONArray;
@@ -34,7 +35,7 @@ import java.util.Vector;
  */
 public class SunshineService extends IntentService {
     public static final String LOCATION_SETTING = "LOCATION_SETTING";
-    private final String LOG_TAG = SunshineService.class.getSimpleName();
+    private static final String LOG_TAG = SunshineService.class.getSimpleName();
 
     public SunshineService() {
         super(SunshineService.class.getSimpleName());
@@ -51,8 +52,10 @@ public class SunshineService extends IntentService {
     public static class AlarmReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            String location = intent.getStringExtra(LOCATION_SETTING);
+            if (location==null) { location = Utility.getPreferredLocation(context); }
             Intent i = new Intent(context, SunshineService.class);
-            i.fillIn(intent, 0);
+            i.putExtra(LOCATION_SETTING, location);
             context.startService(i);
         }
     }
