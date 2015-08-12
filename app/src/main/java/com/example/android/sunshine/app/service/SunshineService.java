@@ -45,7 +45,10 @@ public class SunshineService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent==null) { return; }
         final String location = intent.getStringExtra(LOCATION_SETTING);
-        if (location==null || location.isEmpty()) { return; }
+        if (location==null || location.isEmpty()) {
+            Log.e(LOG_TAG, LOCATION_SETTING + " is invalid");
+            return;
+        }
         update(location);
     }
 
