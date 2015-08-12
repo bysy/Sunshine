@@ -37,6 +37,17 @@ public class SunshineService extends IntentService {
     public static final String LOCATION_SETTING = "LOCATION_SETTING";
     private static final String LOG_TAG = SunshineService.class.getSimpleName();
 
+    public static class AlarmReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String location = intent.getStringExtra(LOCATION_SETTING);
+            if (location==null) { location = Utility.getPreferredLocation(context); }
+            Intent i = new Intent(context, SunshineService.class);
+            i.putExtra(LOCATION_SETTING, location);
+            context.startService(i);
+        }
+    }
+
     public SunshineService() {
         super(SunshineService.class.getSimpleName());
     }
@@ -50,17 +61,6 @@ public class SunshineService extends IntentService {
             return;
         }
         update(location);
-    }
-
-    public static class AlarmReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String location = intent.getStringExtra(LOCATION_SETTING);
-            if (location==null) { location = Utility.getPreferredLocation(context); }
-            Intent i = new Intent(context, SunshineService.class);
-            i.putExtra(LOCATION_SETTING, location);
-            context.startService(i);
-        }
     }
 
     /**
@@ -101,6 +101,106 @@ public class SunshineService extends IntentService {
         } finally {
             cursor.close();
         }
+    }
+
+    /** Update the weather data for location. */
+    private void update(String locationQuery) {
+        String forecastJsonStr = retrieveForecastJsonString(locationQuery);
+        if (forecastJsonStr==null) return;
+
+        List<ContentValues> forecast = parseJsonForecast(forecastJsonStr, locationQuery);
+        // add to database
+        if (!forecast.isEmpty()) {
+            getContentResolver().bulkInsert(
+                    WeatherContract.WeatherEntry.CONTENT_URI,
+                    forecast.toArray(new ContentValues[forecast.size()]));
+            Log.d(LOG_TAG, "Sunshine weather update complete: " + forecast.size() + " inserted");
+        } else {
+            Log.d(LOG_TAG, "Sunshine weather update failed");
+        }
+    }
+
+    @Nullable
+    private String retrieveForecastJsonString(String locationQuery) {
+        // These two need to be declared outside the try/catch
+        // so that they can be closed in the finally block.
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        // Will contain the raw JSON response as a string.
+        String forecastJsonStr = null;
+
+        String format = "json";
+        String units = "metric";
+        int numDays = 14;
+
+        try {
+            // Construct the URL for the OpenWeatherMap query
+            // Possible parameters are avaiable at OWM's forecast API page, at
+            // http://openweathermap.org/API#forecast
+            final String FORECAST_BASE_URL =
+                    "http://api.openweathermap.org/data/2.5/forecast/daily?";
+            final String QUERY_PARAM = "q";
+            final String FORMAT_PARAM = "mode";
+            final String UNITS_PARAM = "units";
+            final String DAYS_PARAM = "cnt";
+
+            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                    .appendQueryParameter(QUERY_PARAM, locationQuery)
+                    .appendQueryParameter(FORMAT_PARAM, format)
+                    .appendQueryParameter(UNITS_PARAM, units)
+                    .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                    .build();
+
+            URL url = new URL(builtUri.toString());
+
+            // Create the request to OpenWeatherMap, and open the connection
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuilder buffer = new StringBuilder();
+            if (inputStream == null) {
+                // Nothing to do.
+                return null;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                // But it does make debugging a *lot* easier if you print out the completed
+                // buffer for debugging.
+                buffer.append(line).append("\n");
+            }
+
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return null;
+            }
+            forecastJsonStr = buffer.toString();
+
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error ", e);
+            // If the code didn't successfully get the weather data, there's no point in attempting
+            // to parse it.
+            return null;
+
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error closing stream", e);
+                }
+            }
+        }
+        return forecastJsonStr;
     }
 
     /**
@@ -243,105 +343,5 @@ public class SunshineService extends IntentService {
         }
 
         return Collections.emptyList();
-    }
-
-    /** Update the weather data for location. */
-    private void update(String locationQuery) {
-        String forecastJsonStr = retrieveForecastJsonString(locationQuery);
-        if (forecastJsonStr==null) return;
-
-        List<ContentValues> forecast = parseJsonForecast(forecastJsonStr, locationQuery);
-        // add to database
-        if (!forecast.isEmpty()) {
-            getContentResolver().bulkInsert(
-                    WeatherContract.WeatherEntry.CONTENT_URI,
-                    forecast.toArray(new ContentValues[forecast.size()]));
-            Log.d(LOG_TAG, "Sunshine weather update complete: " + forecast.size() + " inserted");
-        } else {
-            Log.d(LOG_TAG, "Sunshine weather update failed");
-        }
-    }
-
-    @Nullable
-    private String retrieveForecastJsonString(String locationQuery) {
-        // These two need to be declared outside the try/catch
-        // so that they can be closed in the finally block.
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        // Will contain the raw JSON response as a string.
-        String forecastJsonStr = null;
-
-        String format = "json";
-        String units = "metric";
-        int numDays = 14;
-
-        try {
-            // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are avaiable at OWM's forecast API page, at
-            // http://openweathermap.org/API#forecast
-            final String FORECAST_BASE_URL =
-                    "http://api.openweathermap.org/data/2.5/forecast/daily?";
-            final String QUERY_PARAM = "q";
-            final String FORMAT_PARAM = "mode";
-            final String UNITS_PARAM = "units";
-            final String DAYS_PARAM = "cnt";
-
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_PARAM, locationQuery)
-                    .appendQueryParameter(FORMAT_PARAM, format)
-                    .appendQueryParameter(UNITS_PARAM, units)
-                    .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
-                    .build();
-
-            URL url = new URL(builtUri.toString());
-
-            // Create the request to OpenWeatherMap, and open the connection
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-
-            // Read the input stream into a String
-            InputStream inputStream = urlConnection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-            if (inputStream == null) {
-                // Nothing to do.
-                return null;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line).append("\n");
-            }
-
-            if (buffer.length() == 0) {
-                // Stream was empty.  No point in parsing.
-                return null;
-            }
-            forecastJsonStr = buffer.toString();
-
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e);
-            // If the code didn't successfully get the weather data, there's no point in attempting
-            // to parse it.
-            return null;
-
-        } finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
-                }
-            }
-        }
-        return forecastJsonStr;
     }
 }
