@@ -42,7 +42,15 @@ public class OwmHelper {
             context.getContentResolver().bulkInsert(
                     WeatherContract.WeatherEntry.CONTENT_URI,
                     forecast.toArray(new ContentValues[forecast.size()]));
-            Log.d(LOG_TAG, "Sunshine weather update complete: " + forecast.size() + " inserted");
+            Time dayTime = new Time();
+            dayTime.setToNow();
+            int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
+            int numDeleted = context.getContentResolver().delete(
+                    WeatherContract.WeatherEntry.CONTENT_URI,
+                    WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?",
+                    new String[]{Long.toString(dayTime.setJulianDay(julianStartDay - 1))});
+            Log.d(LOG_TAG, "Sunshine weather update complete: " + forecast.size() + " inserted.\n" +
+                    "\tDeleted " + numDeleted + " record(s).");
         } else {
             Log.d(LOG_TAG, "Sunshine weather update failed");
         }
