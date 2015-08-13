@@ -19,12 +19,15 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.text.format.Time;
 import android.util.Log;
 
 import com.example.android.sunshine.app.MainActivity;
 import com.example.android.sunshine.app.R;
 import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
+
+import java.util.Calendar;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int HOUR_IN_SEC = 60 * 60;
@@ -99,6 +102,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     /** Show a forecast notification once daily. */
     static void notifyWeather(Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final boolean notificationsEnabled =
+                prefs.getBoolean(context.getString(R.string.pref_notifications_enabled), true);
+        if (!notificationsEnabled) {
+            return;
+        }
         final String lastNotificationKey = context.getString(R.string.pref_last_notification);
         final long lastSyncTime = prefs.getLong(lastNotificationKey, 0);
         final long currentTimeMillis = System.currentTimeMillis();
