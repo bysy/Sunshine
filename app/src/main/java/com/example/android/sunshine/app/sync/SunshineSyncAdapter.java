@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.android.sunshine.app.R;
+import com.example.android.sunshine.app.Utility;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
@@ -22,7 +23,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "onPerformSync Called.");
-
+        Context context = getContext();
+        OwmHelper.update(context, Utility.getPreferredLocation(context));
     }
 
     /**
