@@ -2,6 +2,7 @@ package com.example.android.sunshine.app;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 
 
@@ -147,7 +149,30 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         final String locKey = getString(R.string.pref_location_key);
         final String location = settings.getString(locKey, "");
-        final Uri uri = Uri.parse("geo:0,0?q="+Uri.encode(location));
+        final Uri locationUri = WeatherContract.LocationEntry.CONTENT_URI;
+        final String[] projection = { WeatherContract.LocationEntry.COLUMN_COORD_LAT,
+                WeatherContract.LocationEntry.COLUMN_COORD_LONG };
+        final int idxLat = 0;
+        final int idxLon = 1;
+        final String selection =
+                WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = " + "\""+location+"\"";
+        final Cursor cursor = getContentResolver()
+                .query(locationUri, projection, selection, null, null);
+        Uri uri = null;
+        boolean success = false;
+        if (cursor.moveToFirst()) {
+            final String lat = cursor.getString(idxLat);
+            final String lon = cursor.getString(idxLon);
+            if (lat!=null && lon!=null && !lat.isEmpty() && !lon.isEmpty()) {
+                uri = Uri.parse("geo:" + lat + "," + lon);
+                success = true;
+            }
+        }
+        if (!success) {
+            // fall bock to regular location query
+            uri = Uri.parse("geo:0,0?q=" + Uri.encode(location));
+        }
+        Log.d(TAG, "Viewing location: " + uri);
         return uri;
     }
 
