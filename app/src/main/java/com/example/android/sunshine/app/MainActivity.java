@@ -156,17 +156,22 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
         final int idxLon = 1;
         final String selection =
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = " + "\""+location+"\"";
-        final Cursor cursor = getContentResolver()
-                .query(locationUri, projection, selection, null, null);
         Uri uri = null;
         boolean success = false;
-        if (cursor.moveToFirst()) {
-            final String lat = cursor.getString(idxLat);
-            final String lon = cursor.getString(idxLon);
-            if (lat!=null && lon!=null && !lat.isEmpty() && !lon.isEmpty()) {
-                uri = Uri.parse("geo:" + lat + "," + lon);
-                success = true;
+        final Cursor cursor = getContentResolver()
+                .query(locationUri, projection, selection, null, null);
+        //noinspection TryFinallyCanBeTryWithResources  // support older API
+        try {
+            if (cursor.moveToFirst()) {
+                final String lat = cursor.getString(idxLat);
+                final String lon = cursor.getString(idxLon);
+                if (lat != null && lon != null && !lat.isEmpty() && !lon.isEmpty()) {
+                    uri = Uri.parse("geo:" + lat + "," + lon);
+                    success = true;
+                }
             }
+        } finally {
+            cursor.close();
         }
         if (!success) {
             // fall bock to regular location query
