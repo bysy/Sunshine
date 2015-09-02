@@ -17,11 +17,12 @@ package com.example.android.sunshine.app;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
+
+import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,6 +38,19 @@ public class Utility {
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
         final NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
         return activeNetworkInfo!=null && activeNetworkInfo.isConnected();
+    }
+
+    public static void setLocationStatus(Context context, @SunshineSyncAdapter.LocationStatus int status) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final String key = context.getString(R.string.location_status_key);
+        prefs.edit().putInt(key, status).commit();
+    }
+
+    public static @SunshineSyncAdapter.LocationStatus int getLocationStatus(Context context) {
+        final String key = context.getString(R.string.location_status_key);
+        //noinspection ResourceType  // always location status due to setter and default
+        return PreferenceManager.getDefaultSharedPreferences(context)
+                .getInt(key, SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
     }
 
     /**

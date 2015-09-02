@@ -17,9 +17,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.text.format.Time;
 import android.util.Log;
 
 import com.example.android.sunshine.app.MainActivity;
@@ -27,9 +27,22 @@ import com.example.android.sunshine.app.R;
 import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
 
-import java.util.Calendar;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({LOCATION_STATUS_OK,
+             LOCATION_STATUS_SERVER_DOWN,
+             LOCATION_STATUS_SERVER_INVALID,
+             LOCATION_STATUS_UNKNOWN})
+    public @interface LocationStatus {}
+
+    public static final int LOCATION_STATUS_OK = 0;
+    public static final int LOCATION_STATUS_SERVER_DOWN = 1;
+    public static final int LOCATION_STATUS_SERVER_INVALID = 2;
+    public static final int LOCATION_STATUS_UNKNOWN = 3;
+
     private static final int HOUR_IN_SEC = 60 * 60;
     private static final int SYNC_INTERVAL = 3 * HOUR_IN_SEC;
     private static final int SYNC_FLEXTIME = 2 * HOUR_IN_SEC;

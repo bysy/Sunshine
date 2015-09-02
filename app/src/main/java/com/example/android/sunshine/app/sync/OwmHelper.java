@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
 
 import org.json.JSONArray;
@@ -33,12 +34,20 @@ public class OwmHelper {
 
     /** Update context's weather content provider with fresh data from OWM. */
     static public void update(Context context, String locationQuery) {
+        Utility.setLocationStatus(context, SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN);
         String forecastJsonStr = OwmHelper.retrieveForecastJsonString(locationQuery);
-        if (forecastJsonStr==null) return;
+        if (forecastJsonStr==null) {
+            Utility.setLocationStatus(context, SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN);
+            Log.d(LOG_TAG, "Sunshine weather update failed: couldn't get a response from server");
+            return;
+        }
 
         List<ContentValues> forecast = OwmHelper.parseJsonForecast(context, forecastJsonStr, locationQuery);
         // add to database
-        if (!forecast.isEmpty()) {
+        if (forecast.isEmpty()) {
+            Utility.setLocationStatus(context, SunshineSyncAdapter.LOCATION_STATUS_SERVER_INVALID);
+            Log.d(LOG_TAG, "Sunshine weather update failed: invalid server response");
+        } else {
             context.getContentResolver().bulkInsert(
                     WeatherContract.WeatherEntry.CONTENT_URI,
                     forecast.toArray(new ContentValues[forecast.size()]));
@@ -49,10 +58,9 @@ public class OwmHelper {
                     WeatherContract.WeatherEntry.CONTENT_URI,
                     WeatherContract.WeatherEntry.COLUMN_DATE + " <= ?",
                     new String[]{Long.toString(dayTime.setJulianDay(julianStartDay - 1))});
+            Utility.setLocationStatus(context, SunshineSyncAdapter.LOCATION_STATUS_OK);
             Log.d(LOG_TAG, "Sunshine weather update complete: " + forecast.size() + " inserted.\n" +
                     "\tDeleted " + numDeleted + " record(s).");
-        } else {
-            Log.d(LOG_TAG, "Sunshine weather update failed");
         }
     }
 
@@ -112,7 +120,8 @@ public class OwmHelper {
             // Possible parameters are avaiable at OWM's forecast API page, at
             // http://openweathermap.org/API#forecast
             final String FORECAST_BASE_URL =
-                    "http://api.openweathermap.org/data/2.5/forecast/daily?";
+                    "http://google.com/ping?";
+                    //"http://api.openweathermap.org/data/2.5/forecast/daily?";
             final String QUERY_PARAM = "q";
             final String FORMAT_PARAM = "mode";
             final String UNITS_PARAM = "units";

@@ -1,6 +1,7 @@
 package com.example.android.sunshine.app;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,7 +30,10 @@ import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ForecastFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+        SharedPreferences.OnSharedPreferenceChangeListener
+{
     private static final String TAG = ForecastFragment.class.getSimpleName();
     private static final String BUNDLE_POSITION_KEY = "BUNDLE_POSITION_KEY";
     private static final int FORECAST_LOADER_ID = 0;
@@ -74,6 +78,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (mForecastAdapter!=null) {
             mForecastAdapter.setUseTodayLayout(useTodayLayout);
         }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (!key.equals(getString(R.string.location_status_key))) {
+            return;
+        }
+        updateEmptyView();
     }
 
     /**
@@ -189,10 +201,24 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateEmptyView() {
-        if (mForecastAdapter.isEmpty()) {
-            if (!Utility.isNetworkAvailable(getActivity())) {
-                mEmptyTextView.setText(getString(R.string.empty_forecast_text) +
-                        "\n" + getString(R.string.no_connectivity_text));
+        if (!mForecastAdapter.isEmpty()) {
+            return;
+        }
+        final String base = getString(R.string.empty_forecast_text);
+
+        if (!Utility.isNetworkAvailable(getActivity())) {
+            mEmptyTextView.setText(base + "\n" + getString(R.string.no_connectivity_text));
+        } else {
+            switch (Utility.getLocationStatus(getActivity())) {
+                case SunshineSyncAdapter.LOCATION_STATUS_SERVER_DOWN:
+                    mEmptyTextView.setText(base + "\n" + getString(R.string.server_down_text));
+                    break;
+                case SunshineSyncAdapter.LOCATION_STATUS_SERVER_INVALID:
+                    mEmptyTextView.setText(base + "\n" + getString(R.string.server_response_invalid_text));
+                    break;
+                case SunshineSyncAdapter.LOCATION_STATUS_UNKNOWN:
+                default:
+                    mEmptyTextView.setText(base + "\n" + getString(R.string.server_unknown_error_text));
             }
         }
     }
