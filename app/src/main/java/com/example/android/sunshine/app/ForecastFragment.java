@@ -182,14 +182,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mForecastAdapter.swapCursor(data);
-        if (!data.moveToFirst()) {
+        updateEmptyView();
+        if (mPosition!=ListView.INVALID_POSITION) {
+            mListView.smoothScrollToPosition(mPosition);  // for tablet UI
+        }
+    }
+
+    private void updateEmptyView() {
+        if (mForecastAdapter.isEmpty()) {
             if (!Utility.isNetworkAvailable(getActivity())) {
                 mEmptyTextView.setText(getString(R.string.empty_forecast_text) +
                         "\n" + getString(R.string.no_connectivity_text));
             }
-        }
-        if (mPosition!=ListView.INVALID_POSITION) {
-            mListView.smoothScrollToPosition(mPosition);  // for tablet UI
         }
     }
 
