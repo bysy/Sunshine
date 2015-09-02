@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
@@ -119,6 +120,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
         mListView = lv;
+        TextView emptyView = (TextView) rootView.findViewById(R.id.empty_list_text_view);
+        mListView.setEmptyView(emptyView);
         // Restore state
         if (savedInstanceState!=null) {
             mPosition = savedInstanceState.getInt(BUNDLE_POSITION_KEY, 0);
