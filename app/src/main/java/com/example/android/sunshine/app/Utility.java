@@ -18,6 +18,8 @@ package com.example.android.sunshine.app;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.text.format.Time;
 
@@ -29,6 +31,13 @@ public class Utility {
     // Format used for storing dates in the database.  ALso used for converting those strings
     // back into date objects for comparison/processing.
     public static final String DATE_FORMAT = "yyyyMMdd";
+
+    public static boolean isNetworkAvailable(Context context) {
+        final ConnectivityManager cm = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        final NetworkInfo activeNetworkInfo = cm.getActiveNetworkInfo();
+        return activeNetworkInfo!=null && activeNetworkInfo.isConnected();
+    }
 
     /**
      * Helper method to convert the database representation of the date into something to display

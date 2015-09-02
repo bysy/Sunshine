@@ -1,12 +1,16 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.net.ConnectivityManagerCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,6 +67,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;  // for Tablet UI
     private boolean mUseTodayLayout = true;
+    private TextView mEmptyTextView;
 
     public void setUseTodayLayout(boolean useTodayLayout) {
         mUseTodayLayout = useTodayLayout;
@@ -120,8 +125,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
         mListView = lv;
-        TextView emptyView = (TextView) rootView.findViewById(R.id.empty_list_text_view);
-        mListView.setEmptyView(emptyView);
+        mEmptyTextView = (TextView) rootView.findViewById(R.id.empty_list_text_view);
+        mListView.setEmptyView(mEmptyTextView);
         // Restore state
         if (savedInstanceState!=null) {
             mPosition = savedInstanceState.getInt(BUNDLE_POSITION_KEY, 0);
@@ -177,6 +182,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mForecastAdapter.swapCursor(data);
+        if (!data.moveToFirst()) {
+            if (!Utility.isNetworkAvailable(getActivity())) {
+                mEmptyTextView.setText(getString(R.string.empty_forecast_text) +
+                        "\n" + getString(R.string.no_connectivity_text));
+            }
+        }
         if (mPosition!=ListView.INVALID_POSITION) {
             mListView.smoothScrollToPosition(mPosition);  // for tablet UI
         }
