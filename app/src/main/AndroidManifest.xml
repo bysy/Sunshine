@@ -51,6 +51,19 @@
             android:name=".data.WeatherProvider"
             android:exported="false"
             android:syncable="true" />
+
+        <!-- Today widget -->
+        <receiver
+            android:name=".widget.TodayWidgetProvider"
+            android:label="@string/today_widget_label" >
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.android.sunshine.app.ACTION_DATA_UPDATED" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/today_widget_info" />
+        </receiver>
+
         <!-- SyncAdapter's dummy authentication service -->
         <service
             android:name=".sync.SunshineAuthenticatorService"
@@ -74,6 +87,10 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/syncadapter" />
         </service>
+        <!-- Widget updater service -->
+        <service
+            android:name=".widget.TodayWidgetUpdateIntentService"
+            android:exported="false" />
     </application>
 
 </manifest>

@@ -76,4 +76,5 @@
     <string name="server_down_text">Weather server is down</string>
     <string name="server_response_invalid_text">Couldn\'t understand server response</string>
     <string name="server_unknown_error_text">An unexpected error occurred while syncing</string>
+    <string name="today_widget_label">@string/app_name</string>
 </resources>

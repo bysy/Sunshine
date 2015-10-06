@@ -38,6 +38,9 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
              LOCATION_STATUS_UNKNOWN})
     public @interface LocationStatus {}
 
+    public static final String ACTION_DATA_UPDATED =
+            "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
+
     public static final int LOCATION_STATUS_OK = 0;
     public static final int LOCATION_STATUS_SERVER_DOWN = 1;
     public static final int LOCATION_STATUS_SERVER_INVALID = 2;
@@ -74,6 +77,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         Context context = getContext();
         OwmHelper.update(context, Utility.getPreferredLocation(context));
         notifyWeather(context);
+        context.sendBroadcast(
+                new Intent(ACTION_DATA_UPDATED).setPackage(context.getPackageName()));
     }
 
     /**
